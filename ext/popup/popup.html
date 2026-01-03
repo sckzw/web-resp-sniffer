@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+
+  <body>
+    <div>
+    <label for="toggle-listener">Web Response Sniffer: </label>
+    <input type="checkbox" id="toggle-listener" />
+    </div>
+
+    <div>
+    <label for="url-filter">URL filter: </label>
+    <input type="text" id="url-filter" name="url-filter" list="url-filter-list" placeholder="Input URL filter" value="*://*/*" />
+    </div>
+
+    <datalist id="url-filter-list">
+      <option value="&lt;all_urls&gt;"></option>
+      <option value="*://*/*"></option>
+    </datalist>
+
+    <div>
+    <label for="type-filter">Type filter: </label>
+    <input type="text" id="type-filter" name="type-filter" list="type-filter-list" placeholder="Input Type filter" />
+    </div>
+
+    <datalist id="type-filter-list">
+      <option value="beacon"></option>
+      <option value="csp_report"></option>
+      <option value="font"></option>
+      <option value="image"></option>
+      <option value="imageset"></option>
+      <option value="json"></option>
+      <option value="main_frame"></option>
+      <option value="media"></option>
+      <option value="object"></option>
+      <option value="object_subrequest"></option>
+      <option value="other"></option>
+      <option value="ping"></option>
+      <option value="script"></option>
+      <option value="speculative"></option>
+      <option value="stylesheet"></option>
+      <option value="sub_frame"></option>
+      <option value="web_manifest"></option>
+      <option value="websocket"></option>
+      <option value="xml_dtd"></option>
+      <option value="xmlhttprequest"></option>
+      <option value="xslt"></option>
+    </datalist>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

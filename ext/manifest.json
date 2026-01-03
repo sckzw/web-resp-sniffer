@@ -1,0 +1,28 @@
+{
+  "manifest_version": 2,
+  "name": "web-resp-sniffer-ext",
+  "version": "1.0",
+  "description": "Web Response Sniffer Ext",
+  "permissions": [
+    "webRequest",
+    "webRequestBlocking",
+    "nativeMessaging",
+    "*://*/*"
+  ],
+  "browser_action": {
+    "default_title": "Web Response Sniffer Ext",
+    "default_popup": "popup/popup.html"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "web-resp-sniffer-ext@sckzw.github.io",
+      "strict_min_version": "50.0"
+    }
+  },
+  "background": {
+    "scripts": [
+      "background.js"
+    ],
+    "persistent": false
+  }
+}
