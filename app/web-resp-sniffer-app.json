@@ -1,0 +1,9 @@
+{
+  "name": "web_resp_sniffer_app",
+  "description": "Web Response Sniffer App",
+  "path": ".\\WebRespSnifferApp\\bin\\Debug\\net9.0-windows7.0\\WebRespSnifferApp.exe",
+  "type": "stdio",
+  "allowed_extensions": [
+    "web-resp-sniffer-ext@sckzw.github.io"
+  ]
+}
