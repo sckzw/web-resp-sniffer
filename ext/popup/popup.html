@@ -8,8 +8,15 @@
 
   <body>
     <div>
-    <label for="toggle-listener">Web Response Sniffer: </label>
-    <input type="checkbox" id="toggle-listener" />
+    <label for="toggle-port">Native App Port: </label>
+    <button id="toggle-port" onclick="togglePort()">Connect</button>
+    </div>
+
+    <hr>
+
+    <div>
+    <label for="toggle-listener">Listener: </label>
+    <button id="toggle-listener" onclick="toggleListener()">Enable</button>
     </div>
 
     <div>
@@ -17,15 +24,15 @@
     <input type="text" id="url-filter" name="url-filter" list="url-filter-list" placeholder="Input URL filter" value="*://*/*" />
     </div>
 
-    <datalist id="url-filter-list">
-      <option value="&lt;all_urls&gt;"></option>
-      <option value="*://*/*"></option>
-    </datalist>
-
     <div>
     <label for="type-filter">Type filter: </label>
     <input type="text" id="type-filter" name="type-filter" list="type-filter-list" placeholder="Input Type filter" />
     </div>
+
+    <datalist id="url-filter-list">
+      <option value="&lt;all_urls&gt;"></option>
+      <option value="*://*/*"></option>
+    </datalist>
 
     <datalist id="type-filter-list">
       <option value="beacon"></option>

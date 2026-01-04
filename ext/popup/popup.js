@@ -1,26 +1,52 @@
-const toggle_listener = document.getElementById('toggle-listener');
+const togglePortButton = document.getElementById('toggle-port');
+const toggleListenerButton = document.getElementById('toggle-listener');
 
 browser.runtime.sendMessage({ command: "getStatus" }).then(response => {
-  toggle_listener.checked = response.status;
+  if (response.portStatus) {
+    togglePortButton.innerText = 'Disconnect';
+  }
+  else {
+    togglePortButton.innerText = 'Connect';
+  }
+  if (response.listenerStatus) {
+    toggleListenerButton.innerText = 'Disable';
+  }
+  else {
+    toggleListenerButton.innerText = 'Enable';
+  }
 });
 
+function togglePort() {
+  if (togglePortButton.innerText == 'Connect') {
+    browser.runtime.sendMessage({ command: 'connect' });
+    togglePortButton.innerText = 'Disconnect';
+  }
+  else if (togglePortButton.innerText == 'Disconnect') {
+    browser.runtime.sendMessage({ command: 'disconnect' });
+    togglePortButton.innerText = 'Connect';
+  }
+}
+
 function toggleListener() {
-  if (toggle_listener.checked) {
-    let msg = {
-      command: 'connect',
+  if (toggleListenerButton.innerText == 'Enable') {
+    let message = {
+      command: 'addListener',
       url_filter: document.getElementById('url-filter').value,
       type_filter: document.getElementById('type-filter').value
     };
 
-    browser.runtime.sendMessage(msg);
+    browser.runtime.sendMessage(message);
+    toggleListenerButton.innerText = 'Disable';
   }
-  else {
-    let msg = {
-      command: 'disconnect'
+  else if (toggleListenerButton.innerText == 'Disable') {
+    let message = {
+      command: 'removeListener'
     };
 
-    browser.runtime.sendMessage(msg);
+    browser.runtime.sendMessage(message);
+    toggleListenerButton.innerText = 'Enable';
   }
 }
 
-toggle_listener.addEventListener('change', toggleListener);
+togglePortButton.addEventListener('click', togglePort);
+toggleListenerButton.addEventListener('click', toggleListener);

@@ -2,16 +2,26 @@ let port;
 
 browser.runtime.onMessage.addListener(onMessage);
 
-function onMessage(message,sender,sendResponse) {
+function onMessage(message, sender, sendResponse) {
   switch (message.command) {
     case "connect":
-      if (port === undefined) {
+      if (!port) {
         port = browser.runtime.connectNative("web_resp_sniffer_app");
 
         port.onMessage.addListener(onPortMessage);
         port.onDisconnect.addListener(onPortDisconnect);
       }
 
+      break;
+    case "disconnect":
+      if (port) {
+        port.postMessage({
+          command: 'onDisconnect'
+        });
+      }
+
+      break;
+    case "addListener":
       let filter = {
         urls: message.url_filter.split(",")
       };
@@ -45,7 +55,7 @@ function onMessage(message,sender,sendResponse) {
       );
 
       break;
-    case "disconnect":
+    case "removeListener":
       if (browser.webRequest.onBeforeRequest.hasListener(onBeforeRequest)) {
         browser.webRequest.onBeforeRequest.removeListener(onBeforeRequest);
       }
@@ -56,29 +66,36 @@ function onMessage(message,sender,sendResponse) {
         browser.webRequest.onResponseStarted.removeListener(onCompleted);
       }
 
-      if (port) {
-        port.postMessage({
-          command: 'onDisconnect'
-        });
-      }
-
       break;
     case "getStatus":
+      let portStatus;
+      let listenerStatus;
+
       if (port) {
-        sendResponse({ status: true });
+        portStatus = true;
       }
       else {
-        sendResponse({ status: false });
+        portStatus = false;
       }
+
+      if (browser.webRequest.onBeforeRequest.hasListener(onBeforeRequest)) {
+        listenerStatus = true;
+      }
+      else {
+        listenerStatus = false;
+      }
+      sendResponse({ portStatus: portStatus, listenerStatus: listenerStatus });
 
       break;
   }
 }
 
-function onPortMessage(msg) {
-  if (msg.command == "disconnect") {
-    port.disconnect();
-    port = undefined;
+function onPortMessage(message) {
+  if (message.command == "disconnect") {
+    if (port) {
+      port.disconnect();
+      port = undefined;
+    }
   }
 }
 
@@ -97,7 +114,9 @@ function onPortDisconnect(p) {
 }
 
 function onBeforeRequest(details) {
-  let filter = browser.webRequest.filterResponseData(details.requestId);
+  if (!port) {
+    return;
+  }
 
   port.postMessage({
     command: 'onBeforeRequest',
@@ -105,6 +124,8 @@ function onBeforeRequest(details) {
     url: details.url,
     type: details.type
   });
+
+  let filter = browser.webRequest.filterResponseData(details.requestId);
 
   filter.ondata = event => {
     filter.write(event.data);
@@ -126,6 +147,10 @@ function onBeforeRequest(details) {
 }
 
 function onResponseStarted(details) {
+  if (!port) {
+    return;
+  }
+
   let headers = details.responseHeaders;
   let header;
   let content_type = '';
@@ -150,6 +175,10 @@ function onResponseStarted(details) {
 }
 
 function onCompleted(details) {
+  if (!port) {
+    return;
+  }
+
   port.postMessage({
     command: 'onCompleted',
     id: details.requestId
