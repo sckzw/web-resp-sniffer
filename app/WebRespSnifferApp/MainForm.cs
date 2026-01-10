@@ -12,6 +12,7 @@ namespace WebRespSnifferApp
         private readonly List<ResponseData> responseDataList = [];
         private readonly Dictionary<string, ResponseData> responseDataIds = [];
         private Regex TagRegex = new( @"^$", RegexOptions.Compiled );
+        private Regex IndexRegex = new( @"^$", RegexOptions.Compiled );
         private Regex PositionRegex = new( @"^$", RegexOptions.Compiled );
 
         public class ExtMessage
@@ -73,6 +74,7 @@ namespace WebRespSnifferApp
         {
             var responseData = responseDataList[e.ItemIndex];
             responseData.UpdateTag( TagRegex );
+            responseData.UpdateIndex( IndexRegex );
             responseData.UpdatePosition( PositionRegex );
 
             var item = new ListViewItem( responseData.Url );
@@ -84,6 +86,7 @@ namespace WebRespSnifferApp
             item.SubItems.Add( responseData.GetPositionText() );
             item.SubItems.Add( responseData.SaveFilePath );
             item.SubItems.Add( responseData.Type );
+            item.SubItems.Add( responseData.GetIndexText() );
 
             e.Item = item;
         }
@@ -210,6 +213,18 @@ namespace WebRespSnifferApp
             try
             {
                 TagRegex = new( TextBoxTagRegex.Text, RegexOptions.Compiled );
+                ResponseDataListView.Invalidate();
+            }
+            catch ( ArgumentException )
+            {
+            }
+        }
+
+        private void TextBoxIndexRegex_TextChanged( object sender, EventArgs e )
+        {
+            try
+            {
+                IndexRegex = new( TextBoxIndexRegex.Text, RegexOptions.Compiled );
                 ResponseDataListView.Invalidate();
             }
             catch ( ArgumentException )
@@ -353,7 +368,7 @@ namespace WebRespSnifferApp
             var responseData = responseDataList[ResponseDataListView.SelectedIndices[0]];
 
             using SaveFileDialog dialog = new();
-            
+
             dialog.FileName = Path.GetFileName( new Uri( responseData.Url ).LocalPath );
             dialog.Filter = "‚·‚×‚Ä‚Ìƒtƒ@ƒCƒ‹(*.*)|*.*";
             dialog.InitialDirectory = Directory.GetCurrentDirectory();

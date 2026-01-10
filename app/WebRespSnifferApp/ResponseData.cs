@@ -14,7 +14,7 @@ namespace WebRespSnifferApp
         public int Position;
         public FileStream TempFile;
         public string SaveFilePath;
-        //public int index;
+        public int Index;
         //public bool isCached;
         //public bool isSaved;
         //public bool isClosed;
@@ -27,6 +27,8 @@ namespace WebRespSnifferApp
             Tag = "";
             TempFile = new FileStream( filePath, FileMode.Create, FileAccess.ReadWrite );
             SaveFilePath = "";
+            Position = -1;
+            Index = -1;
         }
 
         public string UpdateTag( Regex regex )
@@ -50,6 +52,29 @@ namespace WebRespSnifferApp
             }
 
             return Tag;
+        }
+
+        public int UpdateIndex( Regex regex )
+        {
+            Match match = regex.Match( Url );
+
+            if ( match.Success )
+            {
+                if ( match.Groups.Count > 1 && match.Groups[1].Success )
+                {
+                    _ = int.TryParse( match.Groups[1].Value, out Index );
+                }
+                else
+                {
+                    _ = int.TryParse( match.Value, out Index );
+                }
+            }
+            else
+            {
+                Index = -1;
+            }
+
+            return Index;
         }
 
         public int UpdatePosition( Regex regex )
@@ -88,6 +113,18 @@ namespace WebRespSnifferApp
             else
             {
                 return ( Size / 1024 / 1024 ).ToString() + " MB";
+            }
+        }
+
+        public string GetIndexText()
+        {
+            if ( Index < 0 )
+            {
+                return "";
+            }
+            else
+            {
+                return Index.ToString();
             }
         }
 
