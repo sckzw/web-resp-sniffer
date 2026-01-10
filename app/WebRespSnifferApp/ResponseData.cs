@@ -18,6 +18,10 @@ namespace WebRespSnifferApp
         //public bool isCached;
         //public bool isSaved;
         //public bool isClosed;
+        public static string FileNameFormat = "{FileName}_{Tag}_{Index}_{Position}{FileExtension}";
+        public static Regex TagRegex = new( @"^$", RegexOptions.Compiled );
+        public static Regex IndexRegex = new( @"^$", RegexOptions.Compiled );
+        public static Regex PositionRegex = new( @"^$", RegexOptions.Compiled );
 
         public ResponseData( string id, string url, string filePath )
         {
@@ -31,9 +35,31 @@ namespace WebRespSnifferApp
             Index = -1;
         }
 
-        public string UpdateTag( Regex regex )
+        public string GetFileName()
         {
-            Match match = regex.Match( Url );
+            string fileName = FileNameFormat;
+            string filePath = new Uri( Url ).LocalPath;
+
+            var args = new Dictionary<string, string>
+            {
+                { "{FileName}", Path.GetFileNameWithoutExtension( filePath ) },
+                { "{FileExtension}", Path.GetExtension( filePath ) },
+                { "{Tag}", Tag },
+                { "{Index}", GetIndexText() },
+                { "{Position}", GetPositionText() }
+            };
+
+            foreach ( var arg in args )
+            {
+                fileName = fileName.Replace( arg.Key, arg.Value );
+            }
+
+            return fileName;
+        }
+
+        public string UpdateTag()
+        {
+            Match match = TagRegex.Match( Url );
 
             if ( match.Success )
             {
@@ -54,9 +80,9 @@ namespace WebRespSnifferApp
             return Tag;
         }
 
-        public int UpdateIndex( Regex regex )
+        public int UpdateIndex()
         {
-            Match match = regex.Match( Url );
+            Match match = IndexRegex.Match( Url );
 
             if ( match.Success )
             {
@@ -77,9 +103,9 @@ namespace WebRespSnifferApp
             return Index;
         }
 
-        public int UpdatePosition( Regex regex )
+        public int UpdatePosition()
         {
-            Match match = regex.Match( Url );
+            Match match = PositionRegex.Match( Url );
 
             if ( match.Success )
             {
@@ -134,17 +160,8 @@ namespace WebRespSnifferApp
             {
                 return "";
             }
-            else if ( Position < 1024 * 10 )
             {
-                return Position.ToString() + " B";
-            }
-            else if ( Position < 1024 * 1024 * 10 )
-            {
-                return ( Position / 1024 ).ToString() + " KB";
-            }
-            else
-            {
-                return ( Position / 1024 / 1024 ).ToString() + " MB";
+                return Position.ToString();
             }
         }
     }

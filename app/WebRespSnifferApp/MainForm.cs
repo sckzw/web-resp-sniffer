@@ -11,9 +11,6 @@ namespace WebRespSnifferApp
     {
         private readonly List<ResponseData> responseDataList = [];
         private readonly Dictionary<string, ResponseData> responseDataIds = [];
-        private Regex TagRegex = new( @"^$", RegexOptions.Compiled );
-        private Regex IndexRegex = new( @"^$", RegexOptions.Compiled );
-        private Regex PositionRegex = new( @"^$", RegexOptions.Compiled );
 
         public class ExtMessage
         {
@@ -59,6 +56,8 @@ namespace WebRespSnifferApp
             InitializeComponent();
             ResponseDataListView_Initialize();
 
+            TextBoxFileNameFormat.Text = ResponseData.FileNameFormat;
+
             this.Load += ( s, e ) => Task.Run( () => InputExtMessage() );
         }
 
@@ -73,9 +72,9 @@ namespace WebRespSnifferApp
         private void ResponseDataListView_RetrieveVirtualItem( object? sender, RetrieveVirtualItemEventArgs e )
         {
             var responseData = responseDataList[e.ItemIndex];
-            responseData.UpdateTag( TagRegex );
-            responseData.UpdateIndex( IndexRegex );
-            responseData.UpdatePosition( PositionRegex );
+            responseData.UpdateTag();
+            responseData.UpdateIndex();
+            responseData.UpdatePosition();
 
             var item = new ListViewItem( responseData.Url );
             item.SubItems.Add( responseData.ContentType );
@@ -212,7 +211,7 @@ namespace WebRespSnifferApp
         {
             try
             {
-                TagRegex = new( TextBoxTagRegex.Text, RegexOptions.Compiled );
+                ResponseData.TagRegex = new( TextBoxTagRegex.Text, RegexOptions.Compiled );
                 ResponseDataListView.Invalidate();
             }
             catch ( ArgumentException )
@@ -224,7 +223,7 @@ namespace WebRespSnifferApp
         {
             try
             {
-                IndexRegex = new( TextBoxIndexRegex.Text, RegexOptions.Compiled );
+                ResponseData.IndexRegex = new( TextBoxIndexRegex.Text, RegexOptions.Compiled );
                 ResponseDataListView.Invalidate();
             }
             catch ( ArgumentException )
@@ -236,12 +235,17 @@ namespace WebRespSnifferApp
         {
             try
             {
-                PositionRegex = new( TextBoxPositionRegex.Text, RegexOptions.Compiled );
+                ResponseData.PositionRegex = new( TextBoxPositionRegex.Text, RegexOptions.Compiled );
                 ResponseDataListView.Invalidate();
             }
             catch ( ArgumentException )
             {
             }
+        }
+
+        private void TextBoxFileNameFormat_TextChanged( object sender, EventArgs e )
+        {
+            ResponseData.FileNameFormat = TextBoxFileNameFormat.Text;
         }
 
         private void ToolStripMenuItemSelectAll_Click( object sender, EventArgs e )
@@ -263,7 +267,7 @@ namespace WebRespSnifferApp
             }
 
             var responseData = responseDataList[ResponseDataListView.SelectedIndices[0]];
-            var tag = responseData.UpdateTag( TagRegex );
+            var tag = responseData.UpdateTag();
             if ( tag == "" )
             {
                 return;
@@ -273,7 +277,7 @@ namespace WebRespSnifferApp
             ResponseDataListView.SelectedIndices.Clear();
             for ( int i = 0; i < responseDataList.Count; i++ )
             {
-                if ( responseDataList[i].UpdateTag( TagRegex ) == tag )
+                if ( responseDataList[i].UpdateTag() == tag )
                 {
                     ResponseDataListView.SelectedIndices.Add( i );
                 }
@@ -364,20 +368,40 @@ namespace WebRespSnifferApp
             {
                 return;
             }
-
-            var responseData = responseDataList[ResponseDataListView.SelectedIndices[0]];
-
-            using SaveFileDialog dialog = new();
-
-            dialog.FileName = Path.GetFileName( new Uri( responseData.Url ).LocalPath );
-            dialog.Filter = "すべてのファイル(*.*)|*.*";
-            dialog.InitialDirectory = Directory.GetCurrentDirectory();
-            dialog.RestoreDirectory = true;
-
-            if ( dialog.ShowDialog() == DialogResult.OK )
+            else if ( ResponseDataListView.SelectedIndices.Count == 1 )
             {
-                responseData.SaveFilePath = dialog.FileName;
-                File.Copy( responseData.TempFile.Name, responseData.SaveFilePath, true );
+                var responseData = responseDataList[ResponseDataListView.SelectedIndices[0]];
+
+                using SaveFileDialog dialog = new();
+
+                dialog.FileName = responseData.GetFileName();
+                dialog.Filter = "すべてのファイル(*.*)|*.*";
+                dialog.InitialDirectory = Directory.GetCurrentDirectory();
+
+                if ( dialog.ShowDialog() == DialogResult.OK )
+                {
+                    responseData.SaveFilePath = dialog.FileName;
+                    File.Copy( responseData.TempFile.Name, responseData.SaveFilePath, true );
+                }
+            }
+            else
+            {
+                using FolderBrowserDialog dialog = new();
+
+                dialog.InitialDirectory = Directory.GetCurrentDirectory();
+                dialog.ShowNewFolderButton = true;
+
+                if ( dialog.ShowDialog() == DialogResult.OK )
+                {
+                    var selectedPath = dialog.SelectedPath;
+
+                    for ( int i = 0; i < ResponseDataListView.SelectedIndices.Count; i++ )
+                    {
+                        var responseData = responseDataList[ResponseDataListView.SelectedIndices[i]];
+                        responseData.SaveFilePath = selectedPath + Path.DirectorySeparatorChar + responseData.GetFileName();
+                        File.Copy( responseData.TempFile.Name, responseData.SaveFilePath, true );
+                    }
+                }
             }
         }
 
@@ -423,7 +447,7 @@ namespace WebRespSnifferApp
                     ResponseData selectedResponseData = selectedResponseDataList[i];
                     selectedResponseData.SaveFilePath = saveFilePath;
 
-                    selectedResponseData.UpdatePosition( PositionRegex );
+                    selectedResponseData.UpdatePosition();
                     if ( selectedResponseData.Position >= 0 )
                     {
                         saveFileStream.Position = selectedResponseData.Position;

@@ -75,6 +75,8 @@
             TextBoxIndexRegex = new TextBox();
             LabelPositionRegex = new Label();
             TextBoxPositionRegex = new TextBox();
+            LabelFileNameFormat = new Label();
+            TextBoxFileNameFormat = new TextBox();
             ContextMenuStrip.SuspendLayout();
             MainMenuStrip.SuspendLayout();
             SuspendLayout();
@@ -89,7 +91,7 @@
             ResponseDataListView.Location = new Point( 12, 56 );
             ResponseDataListView.Name = "ResponseDataListView";
             ResponseDataListView.ShowItemToolTips = true;
-            ResponseDataListView.Size = new Size( 776, 382 );
+            ResponseDataListView.Size = new Size( 984, 373 );
             ResponseDataListView.TabIndex = 0;
             ResponseDataListView.UseCompatibleStateImageBehavior = false;
             ResponseDataListView.View = View.Details;
@@ -233,7 +235,7 @@
             MainMenuStrip.Items.AddRange( new ToolStripItem[] { ToolStripMenuItemFile, ToolStripMenuItemEdit } );
             MainMenuStrip.Location = new Point( 0, 0 );
             MainMenuStrip.Name = "MainMenuStrip";
-            MainMenuStrip.Size = new Size( 800, 24 );
+            MainMenuStrip.Size = new Size( 1008, 24 );
             MainMenuStrip.TabIndex = 4;
             MainMenuStrip.Text = "menuStrip1";
             // 
@@ -383,11 +385,30 @@
             TextBoxPositionRegex.TabIndex = 8;
             TextBoxPositionRegex.TextChanged +=  TextBoxPositionRegex_TextChanged ;
             // 
+            // LabelFileNameFormat
+            // 
+            LabelFileNameFormat.AutoSize = true;
+            LabelFileNameFormat.Location = new Point( 573, 30 );
+            LabelFileNameFormat.Name = "LabelFileNameFormat";
+            LabelFileNameFormat.Size = new Size( 102, 15 );
+            LabelFileNameFormat.TabIndex = 11;
+            LabelFileNameFormat.Text = "FileName Format: ";
+            // 
+            // TextBoxFileNameFormat
+            // 
+            TextBoxFileNameFormat.Location = new Point( 681, 27 );
+            TextBoxFileNameFormat.Name = "TextBoxFileNameFormat";
+            TextBoxFileNameFormat.Size = new Size( 200, 23 );
+            TextBoxFileNameFormat.TabIndex = 10;
+            TextBoxFileNameFormat.TextChanged +=  TextBoxFileNameFormat_TextChanged ;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF( 7F, 15F );
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size( 800, 450 );
+            ClientSize = new Size( 1008, 441 );
+            Controls.Add( LabelFileNameFormat );
+            Controls.Add( TextBoxFileNameFormat );
             Controls.Add( LabelPositionRegex );
             Controls.Add( TextBoxPositionRegex );
             Controls.Add( LabelIndexRegex );
@@ -454,5 +475,7 @@
         private ToolStripSeparator toolStripMenuItem4;
         private ColumnHeader columnHeader9;
         private ColumnHeader columnHeader10;
+        private Label LabelFileNameFormat;
+        private TextBox TextBoxFileNameFormat;
     }
 }
