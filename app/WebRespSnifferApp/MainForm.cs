@@ -381,6 +381,7 @@ namespace WebRespSnifferApp
                 if ( dialog.ShowDialog() == DialogResult.OK )
                 {
                     responseData.SaveFilePath = dialog.FileName;
+                    responseData.TempFile.Flush();
                     File.Copy( responseData.TempFile.Name, responseData.SaveFilePath, true );
                 }
             }
@@ -399,6 +400,7 @@ namespace WebRespSnifferApp
                     {
                         var responseData = responseDataList[ResponseDataListView.SelectedIndices[i]];
                         responseData.SaveFilePath = selectedPath + Path.DirectorySeparatorChar + responseData.GetFileName();
+                        responseData.TempFile.Flush();
                         File.Copy( responseData.TempFile.Name, responseData.SaveFilePath, true );
                     }
                 }
@@ -453,6 +455,7 @@ namespace WebRespSnifferApp
                         saveFileStream.Position = selectedResponseData.Position;
                     }
 
+                    selectedResponseData.TempFile.Flush();
                     selectedResponseData.TempFile.Seek( 0, SeekOrigin.Begin );
                     selectedResponseData.TempFile.CopyTo( saveFileStream );
                     selectedResponseData.TempFile.Seek( 0, SeekOrigin.End );
