@@ -128,17 +128,13 @@ namespace WebRespSnifferApp
 
         public string GetSizeText()
         {
-            if ( Size < 1024 * 10 )
+            if ( Size < 0 )
             {
-                return Size.ToString() + " B";
-            }
-            else if ( Size < 1024 * 1024 * 10 )
-            {
-                return ( Size / 1024 ).ToString() + " KB";
+                return "";
             }
             else
             {
-                return ( Size / 1024 / 1024 ).ToString() + " MB";
+                return Size.ToString();
             }
         }
 
