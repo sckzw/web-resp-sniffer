@@ -11,6 +11,7 @@ namespace WebRespSnifferApp
     {
         private readonly List<ResponseData> responseDataList = [];
         private readonly Dictionary<string, ResponseData> responseDataIds = [];
+        private string selectedFolder = "";
 
         public class ExtMessage
         {
@@ -376,7 +377,7 @@ namespace WebRespSnifferApp
 
                 dialog.FileName = responseData.GetFileName();
                 dialog.Filter = "すべてのファイル(*.*)|*.*";
-                dialog.InitialDirectory = Directory.GetCurrentDirectory();
+                dialog.RestoreDirectory = true;
 
                 if ( dialog.ShowDialog() == DialogResult.OK )
                 {
@@ -388,18 +389,21 @@ namespace WebRespSnifferApp
             else
             {
                 using FolderBrowserDialog dialog = new();
-
-                dialog.InitialDirectory = Directory.GetCurrentDirectory();
                 dialog.ShowNewFolderButton = true;
+
+                if ( !string.IsNullOrEmpty( selectedFolder ) )
+                {
+                    dialog.SelectedPath = selectedFolder;
+                }
 
                 if ( dialog.ShowDialog() == DialogResult.OK )
                 {
-                    var selectedPath = dialog.SelectedPath;
+                    selectedFolder = dialog.SelectedPath;
 
                     for ( int i = 0; i < ResponseDataListView.SelectedIndices.Count; i++ )
                     {
                         var responseData = responseDataList[ResponseDataListView.SelectedIndices[i]];
-                        responseData.SaveFilePath = selectedPath + Path.DirectorySeparatorChar + responseData.GetFileName();
+                        responseData.SaveFilePath = selectedFolder + Path.DirectorySeparatorChar + responseData.GetFileName();
                         responseData.TempFile.Flush();
                         File.Copy( responseData.TempFile.Name, responseData.SaveFilePath, true );
                     }
@@ -421,7 +425,6 @@ namespace WebRespSnifferApp
             {
                 dialog.FileName = Path.GetFileName( new Uri( responseData.Url ).LocalPath );
                 dialog.Filter = "すべてのファイル(*.*)|*.*";
-                dialog.InitialDirectory = Directory.GetCurrentDirectory();
                 dialog.RestoreDirectory = true;
 
                 if ( dialog.ShowDialog() != DialogResult.OK )
