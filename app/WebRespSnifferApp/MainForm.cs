@@ -514,5 +514,40 @@ namespace WebRespSnifferApp
 
             Process.Start( processStartInfo );
         }
+
+        private void MainForm_Load( object sender, EventArgs e )
+        {
+            Location = Properties.Settings.Default.MainFormLocation;
+            Size = Properties.Settings.Default.MainFormSize;
+            WindowState = (FormWindowState)Properties.Settings.Default.MainFormState;
+
+            foreach ( Screen screen in Screen.AllScreens )
+            {
+                if ( screen.WorkingArea.IntersectsWith( Bounds ) )
+                {
+                    return;
+                }
+            }
+
+            StartPosition = FormStartPosition.WindowsDefaultLocation;
+        }
+
+        private void MainForm_FormClosing( object sender, FormClosingEventArgs e )
+        {
+            if ( WindowState == FormWindowState.Normal )
+            {
+                Properties.Settings.Default.MainFormLocation = Location;
+                Properties.Settings.Default.MainFormSize = Size;
+            }
+            else
+            {
+                Properties.Settings.Default.MainFormLocation = RestoreBounds.Location;
+                Properties.Settings.Default.MainFormSize = RestoreBounds.Size;
+            }
+
+            Properties.Settings.Default.MainFormState = (int)WindowState;
+
+            Properties.Settings.Default.Save();
+        }
     }
 }

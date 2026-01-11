@@ -419,7 +419,9 @@
             Controls.Add( ResponseDataListView );
             Name = "MainForm";
             Text = "Web Response Sniffer App";
+            FormClosing +=  MainForm_FormClosing ;
             FormClosed +=  MainForm_FormClosed ;
+            Load +=  MainForm_Load ;
             ContextMenuStrip.ResumeLayout( false );
             MainMenuStrip.ResumeLayout( false );
             MainMenuStrip.PerformLayout();
